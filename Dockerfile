@@ -2,7 +2,11 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# Python 依赖（无需编译工具，全部预编译 wheel ~15MB）
+# 使用阿里云 pip 镜像源（服务器在国内，需要加速）
+RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/ \
+    && pip config set global.trusted-host mirrors.aliyun.com
+
+# Python 依赖（~40MB，阿里云内网下载极快）
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
