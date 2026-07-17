@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 import logging
 
 from app.api.game import router as game_router
-from app.core.embedding import get_model
+from app.core.embedding import get_model, embed
 from app.data.word_loader import load_word_bank
 
 # 日志
@@ -32,15 +32,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 注册路由
+# 注册 API 路由
 app.include_router(game_router)
-
-
-# 静态文件服务（生产模式：后端同时提供前端静态资源）
-# 路由优先级高于静态文件，/api/* 不会被覆盖
-_static_dir = os.path.join(os.path.dirname(__file__), "..", "static")
-if os.path.isdir(_static_dir):
-    app.mount("/", StaticFiles(directory=_static_dir, html=True), name="static")
 
 
 @app.on_event("startup")
@@ -52,8 +45,9 @@ async def startup():
     words = load_word_bank()
     logger.info(f"Word bank loaded: {len(words)} words")
 
-    # 预加载模型（首次启动会下载，约 95MB）
+    # 预加载模型（ONNX Runtime，秒级加载）
     model = get_model()
+    embed("启动预热")
     logger.info(f"Model ready: {model}")
 
 
@@ -65,3 +59,10 @@ async def health():
         "status": "ok",
         "active_sessions": session_manager.count(),
     }
+
+
+# 静态文件服务（生产模式：后端同时提供前端静态资源）
+# 必须在所有 API 路由之后 mount，否则 StaticFiles 会拦截 /api/*
+_static_dir = os.path.join(os.path.dirname(__file__), "..", "static")
+if os.path.isdir(_static_dir):
+    app.mount("/", StaticFiles(directory=_static_dir, html=True), name="static")

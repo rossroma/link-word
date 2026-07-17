@@ -2,22 +2,18 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# 使用阿里云 pip 镜像（国内加速下载）
-RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/ \
-    && pip config set global.trusted-host mirrors.aliyun.com
-
-# Python 依赖（全部从阿里云镜像下载，含 CPU 版 torch）
+# Python 依赖（无需编译工具，全部预编译 wheel ~15MB）
 COPY backend/requirements.txt .
-RUN pip install --no-cache-dir --default-timeout=300 --retries=5 -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # 后端代码
 COPY backend/app/ ./app/
 
+# ONNX 模型文件（91.5MB，已预导出，无需下载）
+COPY model_files/ ./model_files/
+
 # 前端静态文件
 COPY frontend/ ./static/
-
-# 模型缓存目录
-RUN mkdir -p /app/models
 
 EXPOSE 8000
 
