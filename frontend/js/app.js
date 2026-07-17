@@ -90,6 +90,8 @@ const App = {
                     guess_number: data.guess_count,
                 });
 
+                // 首次猜测时从欢迎状态切换到历史视图
+                Components.showHistory();
                 Components.refreshHistory(this.guesses);
                 Components.clearAndFocusInput();
                 Components.updateGiveupButton(data.guess_count);
