@@ -1,0 +1,32 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: linkword-backend
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./backend/app:/app/app          # 代码热重载
+      - ./word_bank:/app/word_bank:ro   # 词库只读挂载
+      - models:/app/models              # 模型持久化（避免每次重启重新下载）
+    environment:
+      - WORD_BANK_PATH=/app/word_bank/all.json
+      - MODEL_NAME=BAAI/bge-small-zh-v1.5
+      - MODEL_CACHE_DIR=/app/models
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: linkword-nginx
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  models:

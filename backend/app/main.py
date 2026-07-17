@@ -1,0 +1,57 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import logging
+
+from app.api.game import router as game_router
+from app.core.embedding import get_model
+from app.data.word_loader import load_word_bank
+
+# 日志
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger(__name__)
+
+app = FastAPI(
+    title="Link Word - 猜词游戏",
+    version="1.0.0",
+    docs_url="/api/docs",
+    redoc_url=None,
+)
+
+# CORS（开发环境允许所有来源）
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# 注册路由
+app.include_router(game_router)
+
+
+@app.on_event("startup")
+async def startup():
+    """启动时预加载模型和词库。"""
+    logger.info("Starting Link Word server...")
+
+    # 预加载词库
+    words = load_word_bank()
+    logger.info(f"Word bank loaded: {len(words)} words")
+
+    # 预加载模型（首次启动会下载，约 95MB）
+    model = get_model()
+    logger.info(f"Model ready: {model}")
+
+
+@app.get("/api/health")
+async def health():
+    """健康检查端点。"""
+    from app.core.session import session_manager
+    return {
+        "status": "ok",
+        "active_sessions": session_manager.count(),
+    }

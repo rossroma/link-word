@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>猜词游戏 - 语义相似度挑战</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <button id="giveup-btn" class="header-giveup-btn" title="重新开始" style="display: none;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <polyline points="1 20 1 14 7 14"></polyline>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+            </button>
+            <h1 class="title">猜词游戏</h1>
+            <p class="subtitle">语义相似度挑战</p>
+        </header>
+
+        <main class="main">
+            <!-- 目标词卡片（游戏结果也在此展示） -->
+            <div class="target-card" id="target-card">
+                <div class="target-icon" id="target-icon">🎯</div>
+                <div class="target-word" id="target-word">?</div>
+                <div class="target-hint" id="target-hint">目标词隐藏中</div>
+                <div class="target-result" id="target-result" style="display: none;">
+                    <div class="target-result-stats" id="target-result-stats"></div>
+                    <button class="target-result-btn" id="target-result-btn">再来一局</button>
+                </div>
+            </div>
+
+            <!-- 错误提示 -->
+            <div class="error-toast" id="error-toast" style="display: none;"></div>
+
+            <!-- 猜测历史 -->
+            <div class="history-section" id="history-section">
+                <div class="history-header">
+                    <span>猜测历史</span>
+                    <span class="history-count" id="history-count">0 次</span>
+                </div>
+                <div class="history-list" id="history-list">
+                    <div class="history-empty" id="history-empty">
+                        输入词汇开始猜测吧！
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <input
+                type="text"
+                id="guess-input"
+                class="guess-input"
+                inputmode="text"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+                placeholder="输入你的猜测..."
+                maxlength="4"
+            >
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>
