@@ -95,23 +95,16 @@ const Components = {
         const banner = document.getElementById('feedback-banner');
         const fbClass = Utils.feedbackClass(score);
 
-        // 清除之前的自动隐藏定时器
+        // 清除之前的自动隐藏定时器（已废弃，保留以防旧代码触发）
         clearTimeout(this._feedbackTimer);
 
-        // 重置动画：先移除再添加
+        // 短暂移除类名以重新触发动画
         banner.classList.remove('out');
         banner.className = 'feedback-banner ' + fbClass;
         banner.textContent = message;
         banner.style.display = 'block';
 
-        // 3.5 秒后自动淡出
-        this._feedbackTimer = setTimeout(() => {
-            banner.classList.add('out');
-            // 动画结束后隐藏
-            this._feedbackTimer = setTimeout(() => {
-                banner.style.display = 'none';
-            }, 350);
-        }, 3500);
+        // 常驻显示，不再自动消失——避免 display:none 导致下方内容滚动
     },
 
     /**

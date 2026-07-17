@@ -8,6 +8,7 @@ services:
       - "8001:8000"
     volumes:
       - ./backend/app:/app/app          # 代码热重载
+      - ./model_files:/app/app/model_files:ro  # ONNX 模型文件
       - ./word_bank:/app/word_bank:ro   # 词库只读挂载
       - models:/app/models              # 模型持久化（避免每次重启重新下载）
     environment:
