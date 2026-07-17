@@ -20,6 +20,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           debug: true
+          command_timeout: 30m
           script: |
             cd /srv/caddy/sites/link-word
             git pull origin main

@@ -10,6 +10,7 @@
       - MODEL_NAME=BAAI/bge-small-zh-v1.5
       - MODEL_CACHE_DIR=/app/models
       - MAX_GUESSES=50
+      - HF_ENDPOINT=https://hf-mirror.com
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
       interval: 10s

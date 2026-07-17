@@ -2,13 +2,13 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# CPU 版 PyTorch（体积小，避免 CUDA 依赖）
-RUN pip install --no-cache-dir \
-    torch --index-url https://download.pytorch.org/whl/cpu
+# 使用阿里云 pip 镜像（国内加速下载）
+RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/ \
+    && pip config set global.trusted-host mirrors.aliyun.com
 
-# Python 依赖
+# Python 依赖（全部从阿里云镜像下载，含 CPU 版 torch）
 COPY backend/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --default-timeout=300 --retries=5 -r requirements.txt
 
 # 后端代码
 COPY backend/app/ ./app/
