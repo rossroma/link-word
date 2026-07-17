@@ -21,6 +21,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           debug: true
           script: |
-            cd ${{ secrets.SERVER_PATH }}
+            cd /srv/caddy/sites/link-word
             git pull origin main
-            docker compose up -d --build
+            cd /srv/caddy
+            docker compose up -d --build link-word

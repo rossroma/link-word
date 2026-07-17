@@ -89,6 +89,41 @@ const Components = {
     },
 
     /**
+     * 显示分数反馈横幅（俏皮话）
+     */
+    showFeedback(message, score) {
+        const banner = document.getElementById('feedback-banner');
+        const fbClass = Utils.feedbackClass(score);
+
+        // 清除之前的自动隐藏定时器
+        clearTimeout(this._feedbackTimer);
+
+        // 重置动画：先移除再添加
+        banner.classList.remove('out');
+        banner.className = 'feedback-banner ' + fbClass;
+        banner.textContent = message;
+        banner.style.display = 'block';
+
+        // 3.5 秒后自动淡出
+        this._feedbackTimer = setTimeout(() => {
+            banner.classList.add('out');
+            // 动画结束后隐藏
+            this._feedbackTimer = setTimeout(() => {
+                banner.style.display = 'none';
+            }, 350);
+        }, 3500);
+    },
+
+    /**
+     * 隐藏反馈横幅
+     */
+    hideFeedback() {
+        clearTimeout(this._feedbackTimer);
+        const banner = document.getElementById('feedback-banner');
+        banner.style.display = 'none';
+    },
+
+    /**
      * 刷新整个猜测历史列表（按分数从高到低排序）
      */
     refreshHistory(guesses) {
@@ -143,8 +178,8 @@ const Components = {
         document.getElementById('history-count').textContent = '0 次';
         document.getElementById('history-section').style.display = 'none';
         document.getElementById('welcome-section').style.display = 'flex';
-        // 欢迎态：显示美化后的目标卡片
-        document.getElementById('target-card').classList.remove('hidden');
+        // 欢迎态：隐藏目标卡片，等游戏结束时才展示
+        document.getElementById('target-card').classList.add('hidden');
         this.showFooter();
     },
 

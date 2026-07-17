@@ -1,5 +1,8 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 import logging
 
 from app.api.game import router as game_router
@@ -31,6 +34,13 @@ app.add_middleware(
 
 # 注册路由
 app.include_router(game_router)
+
+
+# 静态文件服务（生产模式：后端同时提供前端静态资源）
+# 路由优先级高于静态文件，/api/* 不会被覆盖
+_static_dir = os.path.join(os.path.dirname(__file__), "..", "static")
+if os.path.isdir(_static_dir):
+    app.mount("/", StaticFiles(directory=_static_dir, html=True), name="static")
 
 
 @app.on_event("startup")

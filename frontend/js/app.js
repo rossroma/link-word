@@ -53,6 +53,7 @@ const App = {
 
             Components.resetTarget();
             Components.clearHistory();
+            Components.hideFeedback();
             Components.clearAndFocusInput();
             Components.setInputEnabled(true);
             Components.setLoading(false);
@@ -102,6 +103,11 @@ const App = {
                     // 在目标卡片内展示结果
                     Components.revealTarget(data.target_word, data.status, data.guess_count);
                     Components.setInputEnabled(false);
+                    Components.hideFeedback();
+                } else {
+                    // 游戏继续：显示俏皮反馈
+                    const msg = Utils.getFeedback(data.score);
+                    Components.showFeedback(msg, data.score);
                 }
             }
 

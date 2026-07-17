@@ -1,0 +1,18 @@
+# ===== 猜词游戏 =====
+  link-word:
+    build: ./sites/link-word
+    restart: always
+    expose:
+      - "8000"
+    volumes:
+      - linkword_models:/app/models
+    environment:
+      - MODEL_NAME=BAAI/bge-small-zh-v1.5
+      - MODEL_CACHE_DIR=/app/models
+      - MAX_GUESSES=50
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s

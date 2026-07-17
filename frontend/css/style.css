@@ -315,6 +315,50 @@ body {
   border: 0.5px solid rgba(255, 69, 58, 0.3);
 }
 
+/* ── Feedback Banner ────────────────────────────────────────── */
+.feedback-banner {
+  padding: 12px var(--spacing-md);
+  border-radius: var(--radius-btn);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: var(--spacing-md);
+  animation: feedbackIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  line-height: 1.5;
+  border: 0.5px solid transparent;
+}
+
+.feedback-banner.out {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+/* Score-based feedback colors */
+.feedback-banner.fb-80-99 {
+  background: rgba(50, 215, 75, 0.12);
+  color: var(--green);
+  border-color: rgba(50, 215, 75, 0.25);
+}
+
+.feedback-banner.fb-51-79 {
+  background: rgba(13, 184, 245, 0.12);
+  color: #0DB8F5;
+  border-color: rgba(13, 184, 245, 0.25);
+}
+
+.feedback-banner.fb-21-50 {
+  background: rgba(255, 159, 10, 0.12);
+  color: var(--orange);
+  border-color: rgba(255, 159, 10, 0.25);
+}
+
+.feedback-banner.fb-0-20 {
+  background: rgba(255, 69, 58, 0.12);
+  color: var(--red);
+  border-color: rgba(255, 69, 58, 0.25);
+}
+
 /* ── History Section ───────────────────────────────────────── */
 .history-section {
   flex: 1;
@@ -551,6 +595,11 @@ body {
 @keyframes iconPulse {
   0%, 100% { opacity: 0.65; transform: scale(1); }
   50%      { opacity: 1; transform: scale(1.06); }
+}
+
+@keyframes feedbackIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 /* ── Tablet / Desktop (≥600px) ─────────────────────────────── */
