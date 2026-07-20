@@ -8,6 +8,7 @@ import logging
 from app.api.game import router as game_router
 from app.api.debug import router as debug_router
 from app.core.embedding import get_model, embed
+from app.core.scorer import estimate_noise_floor, set_calibration
 from app.data.word_loader import load_word_bank
 
 # 日志
@@ -40,7 +41,7 @@ app.include_router(debug_router)
 
 @app.on_event("startup")
 async def startup():
-    """启动时预加载模型和词库。"""
+    """启动时预加载模型、词库和统计校准。"""
     logger.info("Starting Link Word server...")
 
     # 预加载词库
@@ -51,6 +52,15 @@ async def startup():
     model = get_model()
     embed("启动预热")
     logger.info(f"Model ready: {model}")
+
+    # 统计校准：采样词对计算余弦相似度分布
+    logger.info("Running statistical calibration...")
+    try:
+        cal = estimate_noise_floor(words)
+        set_calibration(cal)
+        logger.info("Statistical calibration complete")
+    except Exception as e:
+        logger.warning(f"Calibration failed, falling back to linear: {e}")
 
 
 @app.get("/api/health")

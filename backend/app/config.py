@@ -32,6 +32,17 @@ class Config:
     SCORE_MIN_SIM: float = float(os.getenv("SCORE_MIN_SIM", "0.15"))
     SCORE_MAX_SIM: float = float(os.getenv("SCORE_MAX_SIM", "0.90"))
 
+    # 统计校准（方案 B：启动时采样 + sigmoid 映射）
+    CALIBRATION_SAMPLE_SIZE: int = int(
+        os.getenv("CALIBRATION_SAMPLE_SIZE", "100")
+    )
+    CALIBRATION_SIGMOID_CENTER: float = float(
+        os.getenv("CALIBRATION_SIGMOID_CENTER", "1.5")
+    )
+    CALIBRATION_SIGMOID_K: float = float(
+        os.getenv("CALIBRATION_SIGMOID_K", "1.2")
+    )
+
     # 选词器
     WORD_COOLDOWN_MINUTES: int = int(
         os.getenv("WORD_COOLDOWN_MINUTES", "10")

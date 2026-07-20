@@ -349,10 +349,12 @@
         <!-- 校准参数 -->
         <div class="test-section" style="padding: 12px 16px;">
             <label>当前校准参数</label>
-            <div class="params-display">
-                <span class="param-badge">MIN_SIM = <span class="param-value" id="param-min">-</span></span>
-                <span class="param-badge">MAX_SIM = <span class="param-value" id="param-max">-</span></span>
-                <span class="param-badge">映射: <span class="param-value">线性</span></span>
+            <div class="params-display" id="params-display">
+                <span class="param-badge">方法: <span class="param-value" id="param-method">-</span></span>
+                <span class="param-badge">μ = <span class="param-value" id="param-mean">-</span></span>
+                <span class="param-badge">σ = <span class="param-value" id="param-std">-</span></span>
+                <span class="param-badge">center = <span class="param-value" id="param-center">-</span></span>
+                <span class="param-badge">k = <span class="param-value" id="param-k">-</span></span>
             </div>
         </div>
 
@@ -427,8 +429,9 @@
                         <tr>
                             <th>词汇</th>
                             <th>余弦相似度</th>
-                            <th>归一化</th>
-                            <th>分数</th>
+                            <th>z-score</th>
+                            <th>线性对照</th>
+                            <th>当前分数</th>
                         </tr>
                     </thead>
                     <tbody id="results-body">
@@ -601,8 +604,11 @@
 
             // 更新参数显示
             const params = data.calibration_params;
-            document.getElementById('param-min').textContent = params.score_min_sim;
-            document.getElementById('param-max').textContent = params.score_max_sim;
+            document.getElementById('param-method').textContent = params.method || '-';
+            document.getElementById('param-mean').textContent = params.noise_mean ?? '-';
+            document.getElementById('param-std').textContent = params.noise_std ?? '-';
+            document.getElementById('param-center').textContent = params.sigmoid_center ?? '-';
+            document.getElementById('param-k').textContent = params.sigmoid_k ?? '-';
 
             // 按分数降序排列
             const sorted = [...data.results].sort((a, b) => b.score - a.score);
@@ -610,17 +616,18 @@
             tbody.innerHTML = sorted.map(r => {
                 const scoreClass = getScoreClass(r.score);
                 const barClass = getBarClass(r.score);
-                const simPercent = (r.cosine_similarity * 100).toFixed(1);
-                const normPercent = (r.normalized * 100).toFixed(1);
+                const linearClass = getScoreClass(r.linear_score);
+                const zStr = r.z_score != null ? r.z_score.toFixed(2) : '-';
+                const zColor = r.z_score != null
+                    ? (r.z_score >= 0 ? 'var(--green)' : 'var(--red)')
+                    : 'var(--text3)';
 
                 return `
                     <tr>
                         <td class="word-cell">${escapeHtml(r.word)}</td>
-                        <td class="sim-cell">
-                            ${r.cosine_similarity.toFixed(4)}
-                            <span style="color: var(--text3); font-size: 11px;">(${simPercent}%)</span>
-                        </td>
-                        <td class="sim-cell">${r.normalized.toFixed(4)}</td>
+                        <td class="sim-cell">${r.cosine_similarity.toFixed(4)}</td>
+                        <td class="sim-cell" style="color: ${zColor}; font-weight: 600;">${zStr}</td>
+                        <td class="sim-cell"><span class="${linearClass}" style="font-weight: 600;">${r.linear_score}</span></td>
                         <td>
                             <span class="score-cell ${scoreClass}">${r.score}</span>
                             <span class="mini-bar-wrap">
