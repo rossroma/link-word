@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>评分校准测试</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* 测试页面专用样式 */
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px 16px;
+            padding-bottom: 40px;
+        }
+
+        .test-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .test-header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .test-header p {
+            font-size: var(--font-sm);
+            color: var(--text2);
+        }
+
+        .test-section {
+            background: var(--surface);
+            border-radius: var(--radius-card);
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 0.5px solid var(--separator);
+        }
+
+        .test-section label {
+            display: block;
+            font-size: var(--font-xs);
+            font-weight: 600;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .test-section input,
+        .test-section textarea {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 15px;
+            font-weight: 500;
+            border: 1px solid var(--separator);
+            border-radius: var(--radius-btn);
+            background: var(--surface2);
+            color: var(--text);
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.15s;
+        }
+
+        .test-section input:focus,
+        .test-section textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .test-section textarea {
+            min-height: 120px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .test-section input::placeholder,
+        .test-section textarea::placeholder {
+            color: var(--text3);
+            font-weight: 400;
+        }
+
+        .preset-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .preset-btn {
+            padding: 6px 12px;
+            font-size: var(--font-xs);
+            font-weight: 600;
+            border: 1px solid var(--separator);
+            border-radius: var(--radius-pill);
+            background: var(--surface2);
+            color: var(--text2);
+            cursor: pointer;
+            transition: all 0.12s;
+            white-space: nowrap;
+        }
+
+        .preset-btn:active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .preset-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            flex: 1;
+            height: 44px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            background: var(--accent);
+            border: none;
+            border-radius: var(--radius-btn);
+            cursor: pointer;
+            transition: transform 0.12s, opacity 0.12s;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.96);
+            opacity: 0.85;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.35;
+            transform: none;
+        }
+
+        .btn-secondary {
+            height: 44px;
+            padding: 0 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            background: var(--surface2);
+            border: 1px solid var(--separator);
+            border-radius: var(--radius-btn);
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+
+        .btn-secondary:active {
+            background: var(--surface3);
+        }
+
+        /* Results table */
+        .results-section {
+            background: var(--surface);
+            border-radius: var(--radius-card);
+            overflow: hidden;
+            border: 0.5px solid var(--separator);
+            margin-bottom: 16px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 0.5px solid var(--separator);
+            font-size: var(--font-xs);
+            font-weight: 600;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .results-table th {
+            padding: 10px 12px;
+            font-size: var(--font-xs);
+            font-weight: 600;
+            color: var(--text3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: left;
+            border-bottom: 0.5px solid var(--separator);
+            background: rgba(28, 28, 30, 0.5);
+        }
+
+        .results-table th:last-child,
+        .results-table td:last-child {
+            text-align: right;
+            padding-right: 16px;
+        }
+
+        .results-table th:first-child,
+        .results-table td:first-child {
+            padding-left: 16px;
+        }
+
+        .results-table td {
+            padding: 10px 12px;
+            font-size: 14px;
+            border-bottom: 0.5px solid rgba(84, 84, 88, 0.3);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .results-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .results-table .word-cell {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .results-table .sim-cell {
+            color: var(--text2);
+            font-size: 13px;
+        }
+
+        .results-table .score-cell {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        /* Bar in table */
+        .mini-bar-wrap {
+            display: inline-block;
+            width: 60px;
+            height: 4px;
+            background: var(--surface2);
+            border-radius: 2px;
+            vertical-align: middle;
+            margin-left: 6px;
+            overflow: hidden;
+        }
+
+        .mini-bar {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 16px;
+            color: var(--text3);
+            font-size: var(--font-sm);
+        }
+
+        .empty-state-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        /* Params display */
+        .params-display {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .param-badge {
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: 'SF Mono', 'Menlo', monospace;
+            background: var(--surface2);
+            color: var(--text2);
+            border-radius: var(--radius-pill);
+            border: 0.5px solid var(--separator);
+        }
+
+        .param-badge .param-value {
+            color: var(--accent);
+        }
+
+        /* Loading */
+        .loading-overlay {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px;
+            color: var(--text2);
+            font-size: var(--font-sm);
+        }
+
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--surface3);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Error */
+        .test-error {
+            padding: 12px 16px;
+            background: rgba(255, 69, 58, 0.12);
+            color: var(--red);
+            border-radius: var(--radius-btn);
+            font-size: var(--font-sm);
+            font-weight: 500;
+            margin-bottom: 16px;
+            border: 0.5px solid rgba(255, 69, 58, 0.25);
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            color: var(--text2);
+            font-size: var(--font-sm);
+            text-decoration: none;
+            padding: 12px;
+            margin-top: 8px;
+        }
+
+        .back-link:hover {
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🔬 评分校准测试</h1>
+            <p>查看原始余弦相似度 → 校准分数的映射关系</p>
+        </div>
+
+        <!-- 校准参数 -->
+        <div class="test-section" style="padding: 12px 16px;">
+            <label>当前校准参数</label>
+            <div class="params-display">
+                <span class="param-badge">MIN_SIM = <span class="param-value" id="param-min">-</span></span>
+                <span class="param-badge">MAX_SIM = <span class="param-value" id="param-max">-</span></span>
+                <span class="param-badge">映射: <span class="param-value">线性</span></span>
+            </div>
+        </div>
+
+        <!-- 目标词 -->
+        <div class="test-section">
+            <label>目标词</label>
+            <input type="text" id="target-word" placeholder="输入目标词，例如：太阳" maxlength="10" value="太阳">
+        </div>
+
+        <!-- 测试词列表 -->
+        <div class="test-section">
+            <label>测试词汇（每行一个）</label>
+
+            <div class="preset-group" id="preset-group">
+                <button class="preset-btn active" data-preset="sun">太阳</button>
+                <button class="preset-btn" data-preset="computer">电脑</button>
+                <button class="preset-btn" data-preset="happy">快乐</button>
+                <button class="preset-btn" data-preset="panda">熊猫</button>
+                <button class="preset-btn" data-preset="ocean">海洋</button>
+                <button class="preset-btn" data-preset="random">随机混合</button>
+            </div>
+
+            <textarea id="test-words" placeholder="每行输入一个测试词汇...">月亮
+地球
+阳光
+星星
+天空
+白天
+温暖
+炎热
+光明
+宇宙
+键盘
+鼠标
+电脑
+手机
+桌子
+椅子
+吃饭
+睡觉
+跑步
+汽车
+飞机
+大海
+花朵
+树木
+快乐
+悲伤
+自由
+和平
+金钱
+时间</textarea>
+        </div>
+
+        <div class="btn-row">
+            <button class="btn-primary" id="run-btn" onclick="runTest()">▶ 运行测试</button>
+            <button class="btn-secondary" onclick="clearResults()">清空</button>
+        </div>
+
+        <!-- 错误提示 -->
+        <div class="test-error" id="test-error" style="display: none;"></div>
+
+        <!-- 结果区 -->
+        <div class="results-section" id="results-section" style="display: none;">
+            <div class="results-header">
+                <span id="results-title">结果</span>
+                <span style="font-size: 11px; color: var(--text3);" id="results-count"></span>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>词汇</th>
+                            <th>余弦相似度</th>
+                            <th>归一化</th>
+                            <th>分数</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-body">
+                    </tbody>
+                </table>
+            </div>
+            <div id="loading-indicator" class="loading-overlay" style="display: none;">
+                <div class="loading-spinner"></div>
+                计算中...
+            </div>
+            <div id="empty-state" class="empty-state">
+                <span class="empty-state-icon">📊</span>
+                点击「运行测试」查看结果
+            </div>
+        </div>
+
+        <a href="/" class="back-link">← 返回游戏</a>
+    </div>
+
+    <script>
+        // 预设词库
+        const PRESETS = {
+            sun: {
+                target: '太阳',
+                words: [
+                    '月亮', '地球', '阳光', '星星', '天空', '白天', '温暖', '炎热', '光明', '宇宙',
+                    '键盘', '鼠标', '电脑', '手机', '桌子', '椅子', '吃饭', '睡觉', '跑步',
+                    '汽车', '飞机', '大海', '花朵', '树木', '快乐', '悲伤', '自由', '和平', '金钱', '时间'
+                ]
+            },
+            computer: {
+                target: '电脑',
+                words: [
+                    '手机', '键盘', '鼠标', '网络', '屏幕', '软件', '程序', '游戏', '科技', '电子',
+                    '太阳', '月亮', '地球', '大海', '花朵', '树木', '吃饭', '睡觉', '跑步',
+                    '汽车', '飞机', '快乐', '悲伤', '自由', '和平', '金钱', '时间', '医生', '教师', '学校'
+                ]
+            },
+            happy: {
+                target: '快乐',
+                words: [
+                    '开心', '幸福', '喜悦', '欢笑', '满足', '兴奋', '愉快', '高兴', '乐观', '美好',
+                    '悲伤', '愤怒', '恐惧', '焦虑', '孤独', '痛苦', '忧郁', '烦恼', '压抑',
+                    '太阳', '月亮', '电脑', '手机', '汽车', '飞机', '吃饭', '睡觉', '跑步', '大海', '自由'
+                ]
+            },
+            panda: {
+                target: '熊猫',
+                words: [
+                    '动物', '竹子', '中国', '国宝', '老虎', '狮子', '大象', '猴子', '兔子', '猫咪',
+                    '小狗', '企鹅', '海豚', '蝴蝶', '长颈鹿', '孔雀', '鱼儿', '小鸟', '蛇',
+                    '太阳', '电脑', '手机', '汽车', '快乐', '悲伤', '自由', '和平', '大海', '吃饭', '睡觉'
+                ]
+            },
+            ocean: {
+                target: '海洋',
+                words: [
+                    '大海', '海水', '波浪', '沙滩', '海豚', '鲸鱼', '鲨鱼', '珊瑚', '岛屿', '轮船',
+                    '河流', '湖泊', '沙漠', '森林', '火山', '雪山', '草原', '城市',
+                    '太阳', '电脑', '手机', '汽车', '快乐', '悲伤', '自由', '和平', '吃饭', '睡觉', '跑步', '时间'
+                ]
+            },
+            random: {
+                target: '自由',
+                words: [
+                    '梦想', '和平', '勇气', '智慧', '真理', '命运', '灵魂', '记忆', '希望', '爱情',
+                    '监狱', '束缚', '规则', '法律', '秩序', '纪律', '约束', '限制',
+                    '太阳', '电脑', '手机', '汽车', '大海', '吃饭', '睡觉', '跑步', '快乐', '悲伤', '熊猫', '海洋'
+                ]
+            }
+        };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 预设按钮事件
+            document.getElementById('preset-group').addEventListener('click', (e) => {
+                const btn = e.target.closest('.preset-btn');
+                if (!btn) return;
+
+                // 更新 active 状态
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const preset = PRESETS[btn.dataset.preset];
+                if (preset) {
+                    document.getElementById('target-word').value = preset.target;
+                    document.getElementById('test-words').value = preset.words.join('\n');
+                }
+            });
+
+            // 回车键在目标词输入框触发测试
+            document.getElementById('target-word').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    runTest();
+                }
+            });
+
+            // 初始显示结果区
+            document.getElementById('results-section').style.display = 'block';
+        });
+
+        async function runTest() {
+            const targetWord = document.getElementById('target-word').value.trim();
+            const wordsText = document.getElementById('test-words').value.trim();
+
+            if (!targetWord) {
+                showError('请输入目标词');
+                return;
+            }
+
+            if (!wordsText) {
+                showError('请输入至少一个测试词汇');
+                return;
+            }
+
+            const words = wordsText.split('\n')
+                .map(w => w.trim())
+                .filter(w => w.length > 0);
+
+            if (words.length === 0) {
+                showError('请输入至少一个测试词汇');
+                return;
+            }
+
+            if (words.length > 50) {
+                showError('最多支持 50 个词汇');
+                return;
+            }
+
+            hideError();
+            setLoading(true);
+
+            try {
+                const resp = await fetch('/api/debug/calibrate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        target_word: targetWord,
+                        words: words,
+                    }),
+                });
+
+                if (!resp.ok) {
+                    const err = await resp.json().catch(() => ({}));
+                    throw new Error(err.detail || `HTTP ${resp.status}`);
+                }
+
+                const data = await resp.json();
+                renderResults(data);
+            } catch (err) {
+                showError(`请求失败: ${err.message}`);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function renderResults(data) {
+            const tbody = document.getElementById('results-body');
+            const emptyState = document.getElementById('empty-state');
+            const resultsSection = document.getElementById('results-section');
+            const resultsTitle = document.getElementById('results-title');
+            const resultsCount = document.getElementById('results-count');
+
+            resultsSection.style.display = 'block';
+            emptyState.style.display = 'none';
+
+            resultsTitle.textContent = `目标词: ${data.target_word}`;
+            resultsCount.textContent = `${data.results.length} 个词`;
+
+            // 更新参数显示
+            const params = data.calibration_params;
+            document.getElementById('param-min').textContent = params.score_min_sim;
+            document.getElementById('param-max').textContent = params.score_max_sim;
+
+            // 按分数降序排列
+            const sorted = [...data.results].sort((a, b) => b.score - a.score);
+
+            tbody.innerHTML = sorted.map(r => {
+                const scoreClass = getScoreClass(r.score);
+                const barClass = getBarClass(r.score);
+                const simPercent = (r.cosine_similarity * 100).toFixed(1);
+                const normPercent = (r.normalized * 100).toFixed(1);
+
+                return `
+                    <tr>
+                        <td class="word-cell">${escapeHtml(r.word)}</td>
+                        <td class="sim-cell">
+                            ${r.cosine_similarity.toFixed(4)}
+                            <span style="color: var(--text3); font-size: 11px;">(${simPercent}%)</span>
+                        </td>
+                        <td class="sim-cell">${r.normalized.toFixed(4)}</td>
+                        <td>
+                            <span class="score-cell ${scoreClass}">${r.score}</span>
+                            <span class="mini-bar-wrap">
+                                <span class="mini-bar ${barClass}" style="width: ${r.score}%;"></span>
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // 滚动到结果区
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function clearResults() {
+            document.getElementById('results-body').innerHTML = '';
+            document.getElementById('empty-state').style.display = 'block';
+            document.getElementById('results-title').textContent = '结果';
+            document.getElementById('results-count').textContent = '';
+        }
+
+        function setLoading(loading) {
+            const btn = document.getElementById('run-btn');
+            const indicator = document.getElementById('loading-indicator');
+            btn.disabled = loading;
+            btn.textContent = loading ? '⏳ 计算中...' : '▶ 运行测试';
+            indicator.style.display = loading ? 'flex' : 'none';
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('test-error');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('test-error').style.display = 'none';
+        }
+
+        function getScoreClass(score) {
+            if (score === 100) return 'score-100';
+            if (score >= 80) return 'score-80-99';
+            if (score >= 51) return 'score-51-79';
+            if (score >= 21) return 'score-21-50';
+            return 'score-0-20';
+        }
+
+        function getBarClass(score) {
+            if (score === 100) return 'bar-100';
+            if (score >= 80) return 'bar-80-99';
+            if (score >= 51) return 'bar-51-79';
+            if (score >= 21) return 'bar-21-50';
+            return 'bar-0-20';
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

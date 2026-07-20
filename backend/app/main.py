@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 import logging
 
 from app.api.game import router as game_router
+from app.api.debug import router as debug_router
 from app.core.embedding import get_model, embed
 from app.data.word_loader import load_word_bank
 
@@ -34,6 +35,7 @@ app.add_middleware(
 
 # 注册 API 路由
 app.include_router(game_router)
+app.include_router(debug_router)
 
 
 @app.on_event("startup")

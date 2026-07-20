@@ -28,17 +28,26 @@ const App = {
         });
 
         if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', () => {
-                const keyboardHeight = window.innerHeight - window.visualViewport.height;
-                if (keyboardHeight > 100) {
-                    setTimeout(() => {
-                        document.getElementById('guess-input').scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'center',
-                        });
-                    }, 300);
+            const viewport = window.visualViewport;
+            const footer = document.querySelector('.footer');
+
+            const onViewportChange = () => {
+                // 计算键盘高度：布局视口底部 - 可视视口底部
+                const offset = window.innerHeight - viewport.height - viewport.offsetTop;
+
+                if (offset > 50) {
+                    // 键盘弹起：将 footer 固定在键盘上方
+                    footer.style.bottom = `${offset}px`;
+                    // 阻止 iOS Safari 自动滚动页面
+                    window.scrollTo(0, 0);
+                } else {
+                    // 键盘收起：恢复默认
+                    footer.style.bottom = '';
                 }
-            });
+            };
+
+            viewport.addEventListener('resize', onViewportChange);
+            viewport.addEventListener('scroll', onViewportChange);
         }
     },
 
